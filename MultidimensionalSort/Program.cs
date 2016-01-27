@@ -20,7 +20,7 @@ namespace MultidimensionalSort
                     SortingType = new SortingType
                     {
                         Method = SortMethod.Alphabetic,
-                        Order = SortOrderType.Ascending
+                        Order = SortOrderType.Descending
                     }
                 },
                 new MemberType{
@@ -53,11 +53,11 @@ namespace MultidimensionalSort
             Console.ReadLine();
         }
 
-        private static Member[][] ApplySorting(Member[][] listOfMembers, MemberType[] memberTypes)
+        public static Member[][] ApplySorting(IEnumerable<Member[]> listOfMembers, IReadOnlyList<MemberType> memberTypes)
         {
             var ordered = listOfMembers.ApplySorter(members => members, null, true, SortOrderType.Noop);
 
-            for (var memberTypeId = 0; memberTypeId < memberTypes.Length; memberTypeId++)
+            for (var memberTypeId = 0; memberTypeId < memberTypes.Count; memberTypeId++)
             {
                 var memberType = memberTypes[memberTypeId];
                 var memberTypeIdCopy = memberTypeId;
@@ -66,7 +66,7 @@ namespace MultidimensionalSort
                 {
                     // here we need to apply noop comparer to preserve sort results
                     ordered = ordered.ApplyCustomSorter(members => members, ordered, false,
-                        new MembersComparer(memberTypeIdCopy, new NoopComparer<string>()));
+                        new MembersComparer(memberTypeIdCopy, new NoopComparer<string>()), SortOrderType.Noop);
 
                     continue;
                 }
@@ -102,14 +102,12 @@ namespace MultidimensionalSort
         /// Prints list of members list
         /// </summary>
         /// <param name="listOfMembers"></param>
-        private static void PrintMembers(Member[][] listOfMembers)
+        public static void PrintMembers(IEnumerable<Member[]> listOfMembers)
         {
             Console.WriteLine();
 
-            foreach (var members in listOfMembers)
+            foreach (var line in listOfMembers.Select(members => string.Join<Member>(" # ", members)))
             {
-                var line = string.Join<Member>(" # ", members);
-
                 Console.WriteLine(line);
             }
         }

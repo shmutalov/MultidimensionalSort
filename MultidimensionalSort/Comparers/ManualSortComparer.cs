@@ -21,6 +21,9 @@ namespace MultidimensionalSort.Comparers
 
         public int Compare(T x, T y)
         {
+            if (_manualOrderList == null)
+                return 0;
+
             var xId = _manualOrderList.IndexOf(x);
             var yId = _manualOrderList.IndexOf(y);
 
