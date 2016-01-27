@@ -64,6 +64,10 @@ namespace MultidimensionalSort
 
                 if (memberType.SortingType == null)
                 {
+                    // here we need to apply noop comparer to preserve sort results
+                    ordered = ordered.ApplyCustomSorter(members => members, ordered, false,
+                        new MembersComparer(memberTypeIdCopy, new NoopComparer<string>()));
+
                     continue;
                 }
 
