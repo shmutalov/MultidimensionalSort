@@ -26,6 +26,12 @@ namespace MultidimensionalSort.Comparers
             if (_memberId >= x.Length || _memberId >= y.Length)
                 return 0;
 
+            if (_memberId > 0)
+            {
+                if (!x[_memberId - 1].Name.Equals(y[_memberId - 1].Name))
+                    return 0;
+            }
+
             // compare member name with natural comparer
             return _comparer.Compare(x[_memberId].Name, y[_memberId].Name);
         }

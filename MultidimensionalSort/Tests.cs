@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using MultidimensionalSort.Comparers;
 using MultidimensionalSort.Enums;
 using MultidimensionalSort.Models;
 using NUnit.Framework;
@@ -49,10 +51,10 @@ namespace MultidimensionalSort
 
             var sortedListOfMembers = Program.ApplySorting(_testListOfMembers, memberTypes);
 
+            Program.PrintMembers(sortedListOfMembers);
+
             // check result
             Assert.IsTrue(IsListsEqual(expectedListOfMembers, sortedListOfMembers));
-
-            Program.PrintMembers(sortedListOfMembers);
         }
 
         [Test]
@@ -83,10 +85,66 @@ namespace MultidimensionalSort
 
             var sortedListOfMembers = Program.ApplySorting(_testListOfMembers, memberTypes);
 
+            Program.PrintMembers(sortedListOfMembers);
+
             // check result
             Assert.IsTrue(IsListsEqual(expectedListOfMembers, sortedListOfMembers));
+        }
+
+        [Test]
+        public void TestAlphabeticalSortSecondColumn()
+        {
+            var memberTypes = new[] {
+                new MemberType
+                {
+                    Name = "Region",
+                },
+                new MemberType{
+                    Name = "Class",
+                    SortingType = new SortingType
+                    {
+                        Method = SortMethod.Alphabetic,
+                        Order = SortOrderType.Descending
+                    },
+                },
+            };
+
+            var expectedListOfMembers = new[] {
+                new[] { new Member("North"), new Member("C") },
+                new[] { new Member("North"), new Member("A") },
+                new[] { new Member("South"), new Member("C") },
+                new[] { new Member("South"), new Member("B") },
+                new[] { new Member("South"), new Member("A") },
+            };
+
+            var sortedListOfMembers = Program.ApplySorting(_testListOfMembers, memberTypes);
 
             Program.PrintMembers(sortedListOfMembers);
+
+            // check result
+            Assert.IsTrue(IsListsEqual(expectedListOfMembers, sortedListOfMembers));
+        }
+
+        [Test]
+        public void TestManualOrder()
+        {
+            var expectedListOfMembers = new[] {
+                new[] { new Member("North"), new Member("C") },
+                new[] { new Member("North"), new Member("A") },
+                new[] { new Member("South"), new Member("C") },
+                new[] { new Member("South"), new Member("B") },
+                new[] { new Member("South"), new Member("A") },
+            };
+
+            var sortedListOfMembers = _testListOfMembers
+                .OrderBy(members => members, new MembersComparer(0, new NoopComparer<string>()))
+                .ThenByDescending(members => members, new MembersComparer(1))
+                .ToList();
+
+            Program.PrintMembers(sortedListOfMembers);
+
+            // check result
+            Assert.IsTrue(IsListsEqual(expectedListOfMembers, sortedListOfMembers));
         }
 
         private static bool IsListsEqual(IReadOnlyList<Member[]> firstList, IReadOnlyList<Member[]> secondList)
